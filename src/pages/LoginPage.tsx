@@ -80,14 +80,12 @@ const LoginPage = () => {
     setIsloading(true);
     try {
       const response = await AuthService.login(values);
-      console.log('response', response)
       localStorage.setItem('token', JSON.stringify(response));
       saveUser(response.data);
       reset();
       navigate('/')
     } catch (e) {
       if (axios.isAxiosError(e)) {
-        console.log(e.response?.data?.error);
         toast(e.response?.data?.error, { type: 'error' });
       }
     } finally {

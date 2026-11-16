@@ -26,6 +26,7 @@ const InputBox = styled.div<{ $isError?: boolean }>`
       height: 40px;
       outline: none;
       padding-inline: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
       width: 100%;
 
       &:hover {
@@ -33,7 +34,9 @@ const InputBox = styled.div<{ $isError?: boolean }>`
       }
 
       &:focus {
-        border-color: rgba(0, 0, 0, 0.78);
+        border-color: ${props => (props.$isError ? 'red' : 'rgba(0, 0, 0, 0.78)')};
+        box-shadow: ${props =>
+          props.$isError ? '0 0 0 3px rgba(220, 0, 0, 0.12)' : '0 0 0 3px rgba(0, 0, 0, 0.08)'};
       }
 
       &:disabled {

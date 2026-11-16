@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { ToastContainer } from 'react-toastify';
@@ -9,12 +8,12 @@ import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/zoom.css';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <UserProvider>
       <BrowserRouter>
         <App />
         <ToastContainer />
       </BrowserRouter>
-    </UserProvider>
-  </StrictMode>,
+    </UserProvider>,
+  // </StrictMode>,
 )

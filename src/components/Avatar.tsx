@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 type AvatarSize = 'small' | 'medium' | 'large';
