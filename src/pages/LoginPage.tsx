@@ -1,11 +1,17 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Logo from '../components/Logo';
+import AuthService from '../services/AuthService';
+import { useUserContext } from '../contexts/UserContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const Box = styled.div`
   align-items: center;
@@ -52,12 +58,15 @@ const Box = styled.div`
 
 const formSchema = z.object({
   email: z.string('Campo obrigatório').email('E-mail inválido'),
-  password: z.string('Campo obrigatório')
+  senha: z.string('Campo obrigatório')
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const LoginPage = () => {
+  const [isLoading, setIsloading] = useState(false);
+  const navigate = useNavigate();
+  const { saveUser } = useUserContext();
   const {
     handleSubmit,
     control,
@@ -67,11 +76,24 @@ const LoginPage = () => {
     resolver: zodResolver(formSchema),
   });
 
-  console.log('errors', errors)
-
-  const onSubmit: SubmitHandler<FormData> = (values) => {
+  const onSubmit: SubmitHandler<FormData> = async (values) => {
     console.log('values', values);
-    reset();
+    setIsloading(true);
+    try {
+      const response = await AuthService.login(values);
+      console.log('response', response)
+      localStorage.setItem('token', JSON.stringify(response));
+      saveUser(response.data);
+      reset();
+      navigate('/')
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.log(e.response?.data?.error);
+        toast(e.response?.data?.error, { type: 'error' });
+      }
+    } finally {
+      setIsloading(false);
+    }
   }
 
   return (
@@ -95,6 +117,7 @@ const LoginPage = () => {
                       type: 'email',
                       placeholder: 'E-mail...',
                       autoComplete: 'off',
+                      disabled: isLoading,
                       ...field
                     }}
                     error={errors?.email?.message}
@@ -106,7 +129,7 @@ const LoginPage = () => {
 
           <div className='form_field'>
             <Controller
-              name='password'
+              name='senha'
               control={control}
               render={({ field }) => {
                 return (
@@ -116,10 +139,11 @@ const LoginPage = () => {
                       id: 'password',
                       type: 'password',
                       placeholder: 'Senha...',
+                      disabled: isLoading,
                       min: 6,
                       ...field
                     }}
-                    error={errors?.password?.message}
+                    error={errors?.senha?.message}
                   />
                 )
               }}
@@ -127,7 +151,16 @@ const LoginPage = () => {
           </div>
 
           <div className='btn_submit'>
-            <Button type='submit' fullWidth>
+            <Button
+              type='submit'
+              fullWidth
+              disabled={isLoading}
+              startIcon={isLoading ? Loading : undefined}
+              iconProps={{
+                size: 16,
+                color: '#FFFFFF'
+              }}
+            >
               Acessar
             </Button>
           </div>
