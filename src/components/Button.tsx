@@ -32,6 +32,16 @@ const ButtonBox = styled.button<{ $bgColor?: string, $textColor?: string, $fullW
     filter: brightness(70%);
   }
 
+  &:disabled {
+    color: rgba(0, 0, 0, 0.26);
+    background: rgba(0, 0, 0, 0.12);
+    border: none;
+    box-shadow: none;
+    cursor: not-allowed;
+    filter: none;
+    transition: inherit;
+  }
+
   & > .btn_icon {
     height: 16px;
     width: 16px;
@@ -46,13 +56,14 @@ const ButtonBox = styled.button<{ $bgColor?: string, $textColor?: string, $fullW
 interface IButtonProps {
   children: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void; 
+  onClick?: () => void;
+  disabled?: boolean;
   variant?: 'contained' | 'outlined';
   bgColor?: string;
   textColor?: string;
   startIcon?: React.ElementType;
   endIcon?: React.ElementType;
-  iconProps?: React.ComponentProps<'svg'>;
+  iconProps?: React.ComponentProps<'svg'> & { size?: number };
   fullWidth?: boolean;
 }
 
@@ -61,6 +72,7 @@ const Button = (props: IButtonProps) => {
     children,
     type = 'button',
     onClick,
+    disabled,
     variant = 'contained',
     bgColor,
     textColor,
@@ -78,6 +90,7 @@ const Button = (props: IButtonProps) => {
       $textColor={textColor}
       $fullWidth={fullWidth}
       onClick={onClick}
+      disabled={disabled}
     >
       {StartIcon && (
         <div className='btn_icon'>

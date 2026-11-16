@@ -7,6 +7,7 @@ import Logo from '../components/Logo';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router';
+import Loading from '../components/Loading';
 
 const Box = styled.div`
   align-items: center;
@@ -156,11 +157,17 @@ const SignupPage = () => {
           </div>
 
           <div className='actions'>
-            <Button type='submit'>
+            <Button
+              type='submit'
+            >
               Cadastrar
             </Button>
 
-            <Button type='button' variant='outlined' onClick={handleBackPage}>
+            <Button
+              type='button'
+              variant='outlined'
+              onClick={handleBackPage}
+            >
               Voltar
             </Button>
           </div>

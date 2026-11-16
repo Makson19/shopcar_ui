@@ -23,6 +23,7 @@ const InputBox = styled.div<{ $isError?: boolean }>`
       border-radius: 8px;
       font-size: 16px;
       height: 40px;
+      outline: none;
       padding-inline: 8px;
       width: 100%;
 
@@ -32,6 +33,11 @@ const InputBox = styled.div<{ $isError?: boolean }>`
 
       &:focus {
         border-color: rgba(0, 0, 0, 0.78);
+      }
+
+      &:disabled {
+        background: #EAECF0;
+        border-color: #d9d9d9;
       }
     }
 
