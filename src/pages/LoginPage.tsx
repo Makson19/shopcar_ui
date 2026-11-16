@@ -1,17 +1,17 @@
 import { useState } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import Loading from '../components/Loading';
 import Logo from '../components/Logo';
 import AuthService from '../services/AuthService';
 import { useUserContext } from '../contexts/UserContext';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import Loading from '../components/Loading';
 
 const Box = styled.div`
   align-items: center;
@@ -77,7 +77,6 @@ const LoginPage = () => {
   });
 
   const onSubmit: SubmitHandler<FormData> = async (values) => {
-    console.log('values', values);
     setIsloading(true);
     try {
       const response = await AuthService.login(values);
@@ -167,7 +166,7 @@ const LoginPage = () => {
         </form>
 
         <Link to='/cadastrar' className='link' replace>
-          Não tem um conta?
+          Não tem uma conta?
         </Link>
       </div>
     </Box>
