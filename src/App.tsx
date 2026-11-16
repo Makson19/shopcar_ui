@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import PrivateRoute from './components/PrivateRoute';
 import LoginRoute from './components/LoginRoute';
 import Logout from './components/Logout';
+import Template from './components/Template';
 
 const App = () => {
   return (
@@ -12,7 +13,9 @@ const App = () => {
       <Route path='/cadastrar' element={<SignupPage />} />
       <Route path='/logout' element={<Logout />} />
       <Route element={<PrivateRoute />}>
-        <Route path='/' element={<HomePage />} />
+        <Route path='/' element={<Template />}>
+          <Route index element={<HomePage />} />
+        </Route>
       </Route>
     </Routes>
   );

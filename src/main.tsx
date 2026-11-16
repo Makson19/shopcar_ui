@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify';
 import App from './App.tsx';
 import { UserProvider } from './contexts/UserContext.tsx';
 import './index.css';
+import '@szhsin/react-menu/dist/index.css';
+import '@szhsin/react-menu/dist/transitions/zoom.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
