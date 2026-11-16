@@ -1,13 +1,16 @@
-import React from 'react';
+import { useState } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'react-toastify';
 import Logo from '../components/Logo';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { useNavigate } from 'react-router';
 import Loading from '../components/Loading';
+import UserService from '../services/UserService';
 
 const Box = styled.div`
   align-items: center;
@@ -64,6 +67,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const SignupPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const {
     handleSubmit,
@@ -74,13 +78,25 @@ const SignupPage = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit: SubmitHandler<FormData> = (values) => {
-    console.log('values', values);
-    reset();
-  }
-
   const handleBackPage = () => {
     navigate('/login');
+  }
+
+  const onSubmit: SubmitHandler<FormData> = async (values) => {
+    setIsLoading(true);
+    try {
+      await UserService.create(values);
+      toast('Usuário criado com sucesso!', { type: 'success', pauseOnFocusLoss: false });
+      reset();
+      handleBackPage();
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.log(e.response?.data?.error);
+        toast(e.response?.data?.error, { type: 'error' });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -98,12 +114,13 @@ const SignupPage = () => {
               render={({ field }) => {
                 return (
                   <Input
-                    label='Nome'  
+                    label='Nome'
                     inputProps={{
                       id: 'name',
                       type: 'text',
                       placeholder: 'Nome...',
                       autoComplete: 'off',
+                      disabled: isLoading,
                       ...field
                     }}
                     error={errors?.nome?.message}
@@ -125,6 +142,7 @@ const SignupPage = () => {
                       type: 'email',
                       placeholder: 'E-mail...',
                       autoComplete: 'off',
+                      disabled: isLoading,
                       ...field
                     }}
                     error={errors?.email?.message}
@@ -146,6 +164,7 @@ const SignupPage = () => {
                       id: 'password',
                       type: 'password',
                       placeholder: 'Senha...',
+                      disabled: isLoading,
                       min: 6,
                       ...field
                     }}
@@ -159,6 +178,12 @@ const SignupPage = () => {
           <div className='actions'>
             <Button
               type='submit'
+              disabled={isLoading}
+              startIcon={isLoading ? Loading : undefined}
+              iconProps={{
+                size: 16,
+                color: '#FFFFFF'
+              }}
             >
               Cadastrar
             </Button>
@@ -167,6 +192,7 @@ const SignupPage = () => {
               type='button'
               variant='outlined'
               onClick={handleBackPage}
+              disabled={isLoading}
             >
               Voltar
             </Button>

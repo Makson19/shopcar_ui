@@ -133,7 +133,7 @@ const LoginPage = () => {
           </div>
         </form>
 
-        <Link to='/cadastrar' className='link'>
+        <Link to='/cadastrar' className='link' replace>
           Não tem um conta?
         </Link>
       </div>

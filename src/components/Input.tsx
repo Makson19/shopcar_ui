@@ -10,6 +10,7 @@ const InputBox = styled.div<{ $isError?: boolean }>`
     color: #666666;
     font-size: 16px;
     font-weight: 500;
+    width: fit-content;
   }
 
   & > .input_container {
@@ -28,7 +29,7 @@ const InputBox = styled.div<{ $isError?: boolean }>`
       width: 100%;
 
       &:hover {
-        border-color: #b3b3b3;
+        border-color: ${props => props?.$isError ? 'red' : '#b3b3b3'};
       }
 
       &:focus {
