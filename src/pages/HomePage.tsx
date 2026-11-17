@@ -11,6 +11,8 @@ import { useUserContext } from '../contexts/UserContext';
 import type { IVehicle, IVehicleListPayload } from '../types/IVehicle';
 import type { IPagination } from '../types/IPagination';
 import { useNavigate } from 'react-router';
+import Table, { type IColumn } from '../components/Table';
+import Badge from '../components/Badge';
 
 type TDisponivelFilter = 'todos' | 'true' | 'false';
 
@@ -133,155 +135,21 @@ const FilterGroupBox = styled.div`
   }
 `;
 
-const TableWrapBox = styled.div<{ $isDimmed?: boolean }>`
-  border-block: 1px solid #EEF0F4;
-  opacity: ${props => (props.$isDimmed ? 0.55 : 1)};
-  overflow-x: auto;
-  pointer-events: ${props => (props.$isDimmed ? 'none' : 'auto')};
-  transition: opacity 0.2s ease;
+const IdBox = styled.span`
+  color: #666666;
+  font-size: 13px;
+`;
 
-  & > table {
-    border-collapse: collapse;
-    min-width: 880px;
-    width: 100%;
-
-    & > thead > tr > th {
-      border-bottom: 1px solid #EEF0F4;
-      color: #666666;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 12px 16px;
-      text-align: left;
-      text-transform: uppercase;
-      white-space: nowrap;
-
-      &.col_right {
-        text-align: right;
-      }
-    }
-
-    & > tbody > tr {
-      transition: background 0.15s ease;
-
-      &:hover {
-        background: #F8FAFD;
-      }
-
-      & > td {
-        border-bottom: 1px solid #F1F3F7;
-        color: #121212;
-        font-size: 14px;
-        padding: 14px 16px;
-        vertical-align: middle;
-        white-space: nowrap;
-
-        &.col_right {
-          text-align: right;
-        }
-
-        & > .id {
-          color: #666666;
-          font-size: 13px;
-        }
-
-        & > .placa {
-          background: #F8F9FB;
-          border: 1px solid #D9DEE5;
-          border-radius: 4px;
-          font-family: 'Roboto Mono', monospace;
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          padding: 3px 8px;
-          text-transform: uppercase;
-        }
-
-        & > .diaria {
-          font-weight: 600;
-        }
-
-        & > .badge {
-          align-items: center;
-          border-radius: 999px;
-          display: inline-flex;
-          font-size: 12px;
-          font-weight: 600;
-          gap: 6px;
-          padding: 4px 10px;
-
-          & > .dot {
-            border-radius: 50%;
-            height: 6px;
-            width: 6px;
-          }
-
-          &.sim {
-            background: #E6F6EC;
-            color: #1E7B45;
-
-            & > .dot {
-              background: #2FAE63;
-            }
-          }
-
-          &.nao {
-            background: #FDECEC;
-            color: #B3261E;
-
-            & > .dot {
-              background: #E1554B;
-            }
-          }
-        }
-      }
-
-      &:last-child > td {
-        border-bottom: none;
-      }
-    }
-  }
-
-  @media (max-width: 720px) {
-    overflow-x: visible;
-
-    & > table {
-      min-width: unset;
-    }
-
-    & > table > thead {
-      display: none;
-    }
-
-    & > table > tbody > tr {
-      border-bottom: 1px solid #EEF0F4;
-      display: block;
-      padding: 8px 16px;
-
-      &:hover {
-        background: transparent;
-      }
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      & > td {
-        align-items: center;
-        border-bottom: none;
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-
-        &::before {
-          color: #666666;
-          content: attr(data-label);
-          font-size: 13px;
-          font-weight: 500;
-        }
-      }
-    }
-  }
+const Placa = styled.span`
+  background: #F8F9FB;
+  border: 1px solid #D9DEE5;
+  border-radius: 4px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  text-transform: uppercase;
 `;
 
 const ActionButtonBox = styled.div`
@@ -419,6 +287,101 @@ const HomePage = () => {
     navigate('/veiculos/cadastrar');
   }
 
+  const columns: IColumn<IVehicle>[] = [
+    {
+      key: 'id',
+      name: 'ID',
+      align: 'left',
+      render: (row) => {
+        return (
+          <IdBox>
+            #{row?.id}
+          </IdBox>
+        )
+      }
+    },
+    {
+      key: 'brand',
+      name: 'Marca',
+      align: 'left',
+      render: (row) => {
+        return row?.marca
+      }
+    },
+    {
+      key: 'model',
+      name: 'Modelo',
+      align: 'left',
+      render: (row) => {
+        return row?.modelo
+      }
+    },
+    {
+      key: 'sign',
+      name: 'Placa',
+      align: 'left',
+      render: (row) => {
+        return (
+          <Placa>
+            {row?.placa}
+          </Placa>
+        )
+      }
+    },
+    {
+      key: 'year',
+      name: 'Ano',
+      align: 'left',
+      render: (row) => {
+        return row?.ano
+      }
+    },
+    {
+      key: 'daily_rate',
+      name: 'Diária (R$)',
+      align: 'right',
+      render: (row) => {
+        return (
+          <span style={{ fontWeight: 600, textAlign: 'right', display: 'block' }}>
+            {formatDiaria(row?.valorDiaria)}
+          </span>
+        )
+      }
+    },
+    {
+      key: 'available',
+      name: 'Disponível',
+      align: 'left',
+      render: (row) => {
+        return (
+          <Badge
+            label={row?.disponivel ? 'Sim' : 'Não'}
+            type={row?.disponivel ? 'success' : 'error'}
+          />
+        )
+      }
+    },
+    {
+      key: 'actions',
+      name: 'Ações',
+      align: 'left',
+      render: (row) => {
+        return (
+          <ActionButtonBox title={row.disponivel ? undefined : 'Veículo indisponível'}>
+            <Button
+              disabled={!row.disponivel}
+              onClick={() => handleLocar(row)}
+              startIcon={row.disponivel ? MdKey : undefined}
+              iconProps={{ size: 16, color: '#FFFFFF' }}
+            >
+              Locar
+            </Button>
+          </ActionButtonBox>
+        )
+      }
+    }
+  ];
+
   useEffect(() => {
     (async () => {
       await getAllVehicles();
@@ -481,58 +444,11 @@ const HomePage = () => {
               )}
             </EmptyBox>
           ) : (
-            <TableWrapBox $isDimmed={isLoading}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Marca</th>
-                    <th>Modelo</th>
-                    <th>Placa</th>
-                    <th>Ano</th>
-                    <th className='col_right'>Diária (R$)</th>
-                    <th>Disponível</th>
-                    <th >Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vehicles.map((vehicle) => (
-                    <tr key={vehicle.id}>
-                      <td data-label='ID'>
-                        <span className='id'>#{vehicle.id}</span>
-                      </td>
-                      <td data-label='Marca'>{vehicle.marca}</td>
-                      <td data-label='Modelo'>{vehicle.modelo}</td>
-                      <td data-label='Placa'>
-                        <span className='placa'>{vehicle.placa}</span>
-                      </td>
-                      <td data-label='Ano'>{vehicle.ano}</td>
-                      <td data-label='Diária (R$)' className='col_right'>
-                        <span className='diaria'>{formatDiaria(vehicle.valorDiaria)}</span>
-                      </td>
-                      <td data-label='Disponível'>
-                        <span className={vehicle.disponivel ? 'badge sim' : 'badge nao'}>
-                          <span className='dot' />
-                          {vehicle.disponivel ? 'Sim' : 'Não'}
-                        </span>
-                      </td>
-                      <td data-label='Ações' className='col_right'>
-                        <ActionButtonBox title={vehicle.disponivel ? undefined : 'Veículo indisponível'}>
-                          <Button
-                            disabled={!vehicle.disponivel}
-                            onClick={() => handleLocar(vehicle)}
-                            startIcon={vehicle.disponivel ? MdKey : undefined}
-                            iconProps={{ size: 16, color: '#FFFFFF' }}
-                          >
-                            Locar
-                          </Button>
-                        </ActionButtonBox>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </TableWrapBox>
+            <Table
+              columns={columns}
+              data={vehicles}
+              disableEvents={isLoading}
+            />
           )}
 
           <PanelFooterBox>
