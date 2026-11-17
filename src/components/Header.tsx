@@ -82,8 +82,8 @@ const Header = () => {
               <MenuButton>
                 <Avatar
                   initials={getInitials()}
-                  bgColor='#A9B5C6'
-                  textColor='#121212'
+                  bgColor='#005098'
+                  textColor='#ffffff'
                 />
               </MenuButton>
             }

@@ -41,45 +41,49 @@ const TableWrapBox = styled.div<{ $isDimmed?: boolean }>`
         vertical-align: middle;
         white-space: nowrap;
       }
+
+      &:last-child > td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  @media (max-width: 720px) {
+    overflow-x: visible;
+
+    & > table {
+      min-width: unset;
     }
 
-    @media (max-width: 720px) {
-      overflow-x: visible;
+    & > table > thead {
+      display: none;
+    }
 
-      & > table {
-        min-width: unset;
+    & > table > tbody > tr {
+      border-bottom: 1px solid #EEF0F4;
+      display: block;
+      padding: 8px 16px;
+
+      &:hover {
+        background: transparent;
       }
 
-      & > table > thead {
-        display: none;
+      &:last-child {
+        border-bottom: none;
       }
 
-      & > table > tbody > tr {
-        border-bottom: 1px solid #EEF0F4;
-        display: block;
-        padding: 8px 16px;
+      & > td {
+        align-items: center;
+        border-bottom: none;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
 
-        &:hover {
-          background: transparent;
-        }
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        & > td {
-          align-items: center;
-          border-bottom: none;
-          display: flex;
-          justify-content: space-between;
-          padding: 10px 0;
-
-          &::before {
-            color: #666666;
-            content: attr(data-label);
-            font-size: 13px;
-            font-weight: 500;
-          }
+        &::before {
+          color: #666666;
+          content: attr(data-label);
+          font-size: 13px;
+          font-weight: 500;
         }
       }
     }
@@ -139,6 +143,7 @@ const Table = (props: ITableProps) => {
                         width: column?.width,
                         minWidth: 0,
                       }}
+                      data-label={column?.name}
                     >
                       {element}
                     </td>
