@@ -5,6 +5,7 @@ import PrivateRoute from './components/PrivateRoute';
 import LoginRoute from './components/LoginRoute';
 import Logout from './components/Logout';
 import Template from './components/Template';
+import VehicleFormPage from './pages/VehicleFormPage';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <Route element={<PrivateRoute />}>
         <Route path='/' element={<Template />}>
           <Route index element={<HomePage />} />
+          <Route path='veiculos/cadastrar' element={<VehicleFormPage />} />
         </Route>
       </Route>
     </Routes>

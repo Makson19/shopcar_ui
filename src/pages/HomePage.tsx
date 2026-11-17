@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { MdDirectionsCar, MdKey } from 'react-icons/md';
-import Pagination from 'react-js-pagination';
+import Pagination from '../components/Pagination';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
 import VehicleService from '../services/VehicleService';
 import { useUserContext } from '../contexts/UserContext';
-import type { IVehicle, IVehiclePayload } from '../types/IVehicle';
+import type { IVehicle, IVehicleListPayload } from '../types/IVehicle';
 import type { IPagination } from '../types/IPagination';
+import { useNavigate } from 'react-router';
 
 type TDisponivelFilter = 'todos' | 'true' | 'false';
 
@@ -312,56 +313,6 @@ const PanelFooterBox = styled.div`
   }
 `;
 
-const PaginationBox = styled.div`
-  & > ul.pagination {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    & > li > a {
-      align-items: center;
-      border-radius: 6px;
-      color: #666666;
-      cursor: pointer;
-      display: flex;
-      font-size: 14px;
-      font-weight: 500;
-      height: 32px;
-      justify-content: center;
-      min-width: 32px;
-      padding: 0 8px;
-      text-decoration: none;
-      transition: background 0.2s ease, color 0.2s ease;
-
-      &:hover {
-        background: #EEF0F4;
-        color: #121212;
-      }
-    }
-
-    & > li.active > a {
-      background: #319DFF;
-      color: #FFFFFF;
-      font-weight: 600;
-    }
-
-    & > li.disabled > a {
-      color: #C2C7CF;
-      cursor: not-allowed;
-
-      &:hover {
-        background: transparent;
-        color: #C2C7CF;
-      }
-    }
-  }
-`;
-
 const EmptyBox = styled.div`
   align-items: center;
   color: #666666;
@@ -410,17 +361,22 @@ const LoadingWrapBox = styled.div`
 `;
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [vehicles, setVehicles] = useState<IVehicle[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [disponivel, setDisponivel] = useState<TDisponivelFilter>('todos');
+  const [page, setPage] = useState(1);
   const { user } = useUserContext();
+  const per = pagination?.per ?? 10;
+  const total = pagination?.total ?? 0;
+  const from = (page - 1) * per + 1;
+  const to = from + vehicles.length - 1;
 
-  const getAllVehicles = async (params?: IVehiclePayload) => {
+  const getAllVehicles = async (params?: IVehicleListPayload) => {
     setIsLoading(true);
     try {
       const response = await VehicleService.findMany(params);
-      console.log('response', response)
       setVehicles(response?.data ?? []);
       setPagination(response?.pagination ?? null);
     } catch (e) {
@@ -432,15 +388,9 @@ const HomePage = () => {
     }
   }
 
-  useEffect(() => {
-    (async () => {
-      await getAllVehicles();
-    })();
-  }, [])
-
   const fetchWithFilters = (filter: TDisponivelFilter, page: number) => {
     const per = pagination?.per ?? 10;
-    const params: IVehiclePayload = { page, per };
+    const params: IVehicleListPayload = { page, per };
     if (filter !== 'todos') {
       params.disponivel = filter;
     }
@@ -452,8 +402,9 @@ const HomePage = () => {
     fetchWithFilters(value, 1);
   }
 
-  const handlePageChange = (page: number) => {
-    fetchWithFilters(disponivel, page);
+  const handlePageChange = (_e: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+    fetchWithFilters(disponivel, value);
   }
 
   const handleLocar = (vehicle: IVehicle) => {
@@ -464,11 +415,15 @@ const HomePage = () => {
     toast(`${vehicle.marca} ${vehicle.modelo} (${vehicle.placa}) selecionado para locação.`, { type: 'info' });
   }
 
-  const per = pagination?.per ?? 10;
-  const page = pagination?.page ?? 1;
-  const total = pagination?.total ?? 0;
-  const from = (page - 1) * per + 1;
-  const to = from + vehicles.length - 1;
+  const handleNavigateToVehicleForm = () => {
+    navigate('/veiculos/cadastrar');
+  }
+
+  useEffect(() => {
+    (async () => {
+      await getAllVehicles();
+    })();
+  }, [])
 
   return (
     <HomePageBox>
@@ -481,6 +436,7 @@ const HomePage = () => {
 
           <Button
             type='button'
+            onClick={handleNavigateToVehicleForm}
           >
             Cadastrar veículo
           </Button>
@@ -586,26 +542,14 @@ const HomePage = () => {
                 : 'Nenhum veículo para exibir'}
             </span>
 
-            {(pagination?.totalOfPages ?? 0) > 1 && (
-              <PaginationBox>
-                <Pagination
-                  activePage={page}
-                  itemsCountPerPage={per}
-                  totalItemsCount={total}
-                  pageRangeDisplayed={5}
-                  activeClass='active'
-                  prevPageText='‹'
-                  nextPageText='›'
-                  firstPageText='«'
-                  lastPageText='»'
-                  pageAriaLabel='Ir para a página :page'
-                  prevPageAriaLabel='Ir para a página anterior'
-                  nextPageAriaLabel='Ir para a próxima página'
-                  firstPageAriaLabel='Ir para a primeira página'
-                  lastPageAriaLabel='Ir para a última página'
-                  onChange={handlePageChange}
-                />
-              </PaginationBox>
+            {(pagination?.totalOfPages && pagination?.totalOfPages > 1) && (
+              <Pagination
+                count={pagination?.totalOfPages}
+                size='small'
+                page={page}
+                shape='rounded'
+                onChange={handlePageChange}
+              />
             )}
           </PanelFooterBox>
         </PanelBox>

@@ -91,7 +91,6 @@ const SignupPage = () => {
       handleBackPage();
     } catch (e) {
       if (axios.isAxiosError(e)) {
-        console.log(e.response?.data?.error);
         toast(e.response?.data?.error, { type: 'error' });
       }
     } finally {

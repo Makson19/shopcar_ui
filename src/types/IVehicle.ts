@@ -1,9 +1,17 @@
 import type { IPagination } from "./IPagination";
 
-export interface IVehiclePayload {
+export interface IVehicleListPayload {
   disponivel?: 'true' | 'false';
   per?: number;
   page?: number;
+}
+
+export interface IVehiclePayload {
+  marca: string;
+  modelo: string;
+  placa: string;
+  ano: number;
+  valorDiaria: number;
 }
 
 export interface IVehicle {
