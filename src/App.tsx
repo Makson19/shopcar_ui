@@ -6,6 +6,7 @@ import LoginRoute from './components/LoginRoute';
 import Logout from './components/Logout';
 import Template from './components/Template';
 import VehicleFormPage from './pages/VehicleFormPage';
+import RentalPage from './pages/RentalPage';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path='/' element={<Template />}>
           <Route index element={<HomePage />} />
           <Route path='veiculos/cadastrar' element={<VehicleFormPage />} />
+          <Route path='locacoes' element={<RentalPage />} />
         </Route>
       </Route>
     </Routes>

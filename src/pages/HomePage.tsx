@@ -13,27 +13,13 @@ import type { IPagination } from '../types/IPagination';
 import { useNavigate } from 'react-router';
 import Table, { type IColumn } from '../components/Table';
 import Badge from '../components/Badge';
+import { formatDiaria } from '../utils/functions';
 
-type TDisponivelFilter = 'todos' | 'true' | 'false';
-
-const FILTER_OPTIONS: Array<{ label: string, value: TDisponivelFilter }> = [
-  { label: 'Todos', value: 'todos' },
-  { label: 'Disponíveis', value: 'true' },
-  { label: 'Indisponíveis', value: 'false' },
-];
-
-const formatDiaria = (valor: string) => {
-  const numero = Number(valor);
-  if (Number.isNaN(numero)) {
-    return valor;
-  }
-  return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-};
 
 const HomePageBox = styled.div`
   & > .container {
     margin-inline: auto;
-    max-width: 1000px;
+    max-width: 1200px;
     padding: 24px 16px 40px;
 
     & > .header {
@@ -92,45 +78,6 @@ const ToolbarBox = styled.div`
       font-size: 13px;
       font-weight: 700;
       padding: 2px 10px;
-    }
-  }
-`;
-
-const FilterGroupBox = styled.div`
-  background: #EEF0F4;
-  border-radius: 8px;
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-
-  & > button {
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    color: #666666;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 7px 14px;
-    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      color: #121212;
-    }
-
-    &.active {
-      background: #FFFFFF;
-      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.1);
-      color: #319DFF;
-      font-weight: 600;
-    }
-  }
-
-  @media (max-width: 720px) {
-    width: 100%;
-
-    & > button {
-      flex: 1;
     }
   }
 `;
@@ -233,7 +180,6 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [vehicles, setVehicles] = useState<IVehicle[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
-  const [disponivel, setDisponivel] = useState<TDisponivelFilter>('todos');
   const [page, setPage] = useState(1);
   const { user } = useUserContext();
   const per = pagination?.per ?? 10;
@@ -244,7 +190,7 @@ const HomePage = () => {
   const getAllVehicles = async (params?: IVehicleListPayload) => {
     setIsLoading(true);
     try {
-      const response = await VehicleService.findMany(params);
+      const response = await VehicleService.findMany({ disponivel: 'true', ...params });
       setVehicles(response?.data ?? []);
       setPagination(response?.pagination ?? null);
     } catch (e) {
@@ -256,23 +202,15 @@ const HomePage = () => {
     }
   }
 
-  const fetchWithFilters = (filter: TDisponivelFilter, page: number) => {
+  const fetchWithFilters = (page: number) => {
     const per = pagination?.per ?? 10;
     const params: IVehicleListPayload = { page, per };
-    if (filter !== 'todos') {
-      params.disponivel = filter;
-    }
     getAllVehicles(params);
-  }
-
-  const handleFilterChange = (value: TDisponivelFilter) => {
-    setDisponivel(value);
-    fetchWithFilters(value, 1);
   }
 
   const handlePageChange = (_e: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-    fetchWithFilters(disponivel, value);
+    fetchWithFilters(value);
   }
 
   const handleLocar = (vehicle: IVehicle) => {
@@ -411,19 +349,6 @@ const HomePage = () => {
               <h2>Veículos</h2>
               <span className='count'>{pagination ? total : '—'}</span>
             </div>
-
-            <FilterGroupBox role='group' aria-label='Filtrar por disponibilidade'>
-              {FILTER_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  className={disponivel === option.value ? 'active' : undefined}
-                  aria-pressed={disponivel === option.value}
-                  onClick={() => handleFilterChange(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </FilterGroupBox>
           </ToolbarBox>
 
           {isLoading && vehicles.length === 0 ? (
@@ -434,14 +359,7 @@ const HomePage = () => {
             <EmptyBox>
               <MdDirectionsCar size={48} />
               <h3>Nenhum veículo encontrado</h3>
-              <p>
-                {disponivel === 'todos'
-                  ? 'Não há veículos cadastrados.'
-                  : 'Nenhum veículo corresponde ao filtro selecionado.'}
-              </p>
-              {disponivel !== 'todos' && (
-                <button onClick={() => handleFilterChange('todos')}>Limpar filtro</button>
-              )}
+              <p>Não há veículos cadastrados.</p>
             </EmptyBox>
           ) : (
             <Table
@@ -458,7 +376,7 @@ const HomePage = () => {
                 : 'Nenhum veículo para exibir'}
             </span>
 
-            {(pagination?.totalOfPages && pagination?.totalOfPages > 1) && (
+            {(pagination?.totalOfPages ?? 0) > 1 && (
               <Pagination
                 count={pagination?.totalOfPages}
                 size='small'

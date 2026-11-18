@@ -17,3 +17,29 @@ export const isAuthenticated = (): boolean => {
     return false;
   }
 }
+
+export const formatDiaria = (valor: string) => {
+  const numero = Number(valor);
+  if (Number.isNaN(numero)) {
+    return valor;
+  }
+  return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
+
+export const formatDate = (value: string) => {
+  if (!value) {
+    return '—';
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const [, ano, mes, dia] = match;
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  const data = new Date(value);
+  if (Number.isNaN(data.getTime())) {
+    return value;
+  }
+  return data.toLocaleDateString('pt-BR');
+};
