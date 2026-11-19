@@ -70,7 +70,7 @@ A aplicação foi construída com **React + TypeScript + Vite**, utilizando comp
 
 ```bash
 # 1. Clone o repositório
-git clone <url-do-repositorio>
+git clone https://github.com/Makson19/shopcar_ui.git
 
 # 2. Acesse a pasta do projeto
 cd shopcar_ui
