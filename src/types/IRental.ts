@@ -23,4 +23,8 @@ export interface IRentalListResponse {
   pagination: IPagination;
 }
 
-
+export interface IRentalCarPayload {
+  veiculoId: number;
+  dataInicio: string;
+  dataPrevistaDevolucao: string;
+}

@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import { MdDirectionsCar, MdKey } from 'react-icons/md';
-import Pagination from '../components/Pagination';
 import axios from 'axios';
+import Pagination from '../components/Pagination';
 import { toast } from 'react-toastify';
+import Badge from '../components/Badge';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
+import RentalFormModal from '../components/RentalFormModal';
+import Table, { type IColumn } from '../components/Table';
 import VehicleService from '../services/VehicleService';
 import { useUserContext } from '../contexts/UserContext';
 import type { IVehicle, IVehicleListPayload } from '../types/IVehicle';
 import type { IPagination } from '../types/IPagination';
-import { useNavigate } from 'react-router';
-import Table, { type IColumn } from '../components/Table';
-import Badge from '../components/Badge';
 import { formatDiaria } from '../utils/functions';
+import { MdDirectionsCar, MdKey } from 'react-icons/md';
 
 
 const HomePageBox = styled.div`
@@ -181,6 +182,7 @@ const HomePage = () => {
   const [vehicles, setVehicles] = useState<IVehicle[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [page, setPage] = useState(1);
+  const [vehicleToRent, setVehicleToRent] = useState<IVehicle | null>(null);
   const { user } = useUserContext();
   const per = pagination?.per ?? 10;
   const total = pagination?.total ?? 0;
@@ -217,8 +219,15 @@ const HomePage = () => {
     if (!vehicle.disponivel) {
       return;
     }
-    // TODO: integrar com o fluxo de locação (rota /locacoes)
-    toast(`${vehicle.marca} ${vehicle.modelo} (${vehicle.placa}) selecionado para locação.`, { type: 'info' });
+    setVehicleToRent(vehicle);
+  }
+
+  const handleCloseRentalModal = () => {
+    setVehicleToRent(null);
+  }
+
+  const handleRentalSuccess = () => {
+    getAllVehicles({ page, per, disponivel: 'true' });
   }
 
   const handleNavigateToVehicleForm = () => {
@@ -388,6 +397,13 @@ const HomePage = () => {
           </PanelFooterBox>
         </PanelBox>
       </div>
+
+      <RentalFormModal
+        open={Boolean(vehicleToRent)}
+        vehicle={vehicleToRent}
+        onClose={handleCloseRentalModal}
+        onSuccess={handleRentalSuccess}
+      />
     </HomePageBox>
   );
 };

@@ -1,5 +1,5 @@
 import api from '../api/api';
-import type { IRentalListPayload } from '../types/IRental';
+import type { IRentalCarPayload, IRentalListPayload } from '../types/IRental';
 
 class RentalService {
   async findMany(params?: IRentalListPayload) {
@@ -9,6 +9,11 @@ class RentalService {
 
   async finish(id: number) {
     const response = await api.patch(`/locacoes/${id}/finalizar`);
+    return response.data;
+  }
+
+  async rent(data: IRentalCarPayload) {
+    const response = await api.post('/locacoes', data);
     return response.data;
   }
 }

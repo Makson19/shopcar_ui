@@ -254,7 +254,7 @@ const RentalPage = () => {
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [status, setStatus] = useState<TStatusFilter>('todos');
   const [page, setPage] = useState(1);
-  const [finishingId, setFinishingId] = useState<number | null>(null);
+  const [isFinishing, setIsFinishing] = useState<number | null>(null);
   const [rentalToFinish, setRentalToFinish] = useState<IRental | null>(null);
   const per = pagination?.per ?? 10;
   const total = pagination?.total ?? 0;
@@ -296,7 +296,7 @@ const RentalPage = () => {
   }
 
   const handleOpenFinishDialog = (rental: IRental) => {
-    if (!isAtiva(rental?.status) || finishingId) {
+    if (!isAtiva(rental?.status) || isFinishing) {
       return;
     }
 
@@ -304,7 +304,7 @@ const RentalPage = () => {
   }
 
   const handleCloseFinishDialog = () => {
-    if (finishingId) {
+    if (isFinishing) {
       return;
     }
     setRentalToFinish(null);
@@ -312,11 +312,11 @@ const RentalPage = () => {
 
   const handleConfirmFinish = async () => {
     const rental = rentalToFinish;
-    if (!rental || finishingId) {
+    if (!rental || isFinishing) {
       return;
     }
 
-    setFinishingId(rental.id);
+    setIsFinishing(rental.id);
     try {
       const response = await RentalService.finish(rental.id);
       const veiculo = response?.veiculo;
@@ -333,7 +333,7 @@ const RentalPage = () => {
         toast(e.response?.data?.error, { type: 'error' });
       }
     } finally {
-      setFinishingId(null);
+      setIsFinishing(null);
     }
   }
 
@@ -437,7 +437,7 @@ const RentalPage = () => {
         return (
           <ActionButtonBox title={ativa ? undefined : 'Locação não está mais ativa'}>
             <Button
-              disabled={!ativa || finishingId === row.id}
+              disabled={!ativa || isFinishing === row.id}
               onClick={() => handleOpenFinishDialog(row)}
               startIcon={MdCheckCircle}
               iconProps={{ size: 16, color: '#FFFFFF' }}
@@ -564,12 +564,12 @@ const RentalPage = () => {
           </DialogContentText>
         </DialogContent>
 
-        <DialogActions>
+        <DialogActions sx={{ padding: '16px' }}>
           <Button
             type='button'
             variant='outlined'
             onClick={handleCloseFinishDialog}
-            disabled={Boolean(finishingId)}
+            disabled={Boolean(isFinishing)}
           >
             Cancelar
           </Button>
@@ -577,11 +577,11 @@ const RentalPage = () => {
           <Button
             type='button'
             onClick={handleConfirmFinish}
-            disabled={Boolean(finishingId)}
-            startIcon={MdCheckCircle}
+            disabled={Boolean(isFinishing)}
+            startIcon={isFinishing ? Loading : MdCheckCircle}
             iconProps={{ size: 16, color: '#FFFFFF' }}
           >
-            {finishingId ? 'Finalizando...' : 'Finalizar'}
+            {isFinishing ? 'Finalizando...' : 'Finalizar'}
           </Button>
         </DialogActions>
       </Dialog>
