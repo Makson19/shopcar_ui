@@ -115,7 +115,8 @@ const LoginPage = () => {
                       placeholder: 'E-mail...',
                       autoComplete: 'off',
                       disabled: isLoading,
-                      ...field
+                      ...field,
+                      value: field.value ?? ''
                     }}
                     error={errors?.email?.message}
                   />
@@ -138,7 +139,8 @@ const LoginPage = () => {
                       placeholder: 'Senha...',
                       disabled: isLoading,
                       min: 6,
-                      ...field
+                      ...field,
+                      value: field.value ?? ''
                     }}
                     error={errors?.senha?.message}
                   />
